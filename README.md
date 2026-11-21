@@ -25,15 +25,30 @@ vean de la misma familia. Si la app cambia de paleta, aquí se ajusta el bloque
 
 ## El video
 
-`medios/sereno-30s-horizontal.mp4` — 1920×1080, 30 s.
+Hay dos montajes del mismo demo y la página elige según el ancho de pantalla:
 
-Se generó a partir de `sereno-30s-vertical.mp4` (1080×1920), que es el que
-grabó el equipo contra la aplicación en producción. **No había una versión
-horizontal**: esta se armó con ffmpeg poniendo el vertical centrado sobre un
-fondo desenfocado del propio video.
+| Archivo | Medidas | Cuándo se sirve |
+|---|---|---|
+| `medios/sereno-30s-horizontal.mp4` | 1920×1080 | 768 px o más |
+| `medios/sereno-30s-vertical.mp4` | 1080×1920 | menos de 768 px |
 
-Si alguien vuelve a grabar en horizontal de verdad, basta reemplazar el archivo
-con el mismo nombre.
+Los dos los grabó el equipo contra la aplicación en producción.
+
+El `<video>` arranca con el horizontal para que funcione **sin JavaScript**; un
+script corto cambia la fuente y el póster si la pantalla es angosta, y vuelve a
+cambiarlos si se gira el teléfono, conservando el punto en que iba.
+
+Cada montaje tiene su propio póster (`medios/poster-horizontal.jpg` y
+`medios/poster-vertical.jpg`), sacados con ffmpeg del segundo 4 y del 2.5 de
+cada video. Es a propósito: un póster apaisado dentro del marco vertical dejaba
+dos franjas negras enormes.
+
+Para reemplazar un montaje, basta sobrescribir el archivo con el mismo nombre y
+regenerar su póster:
+
+```bash
+ffmpeg -ss 4 -i medios/sereno-30s-horizontal.mp4 -frames:v 1 -q:v 3 medios/poster-horizontal.jpg
+```
 
 ## Verlo en local
 

@@ -289,6 +289,22 @@ h1, h2, h3 {
   margin-top: 8px;
 }
 .pantalla video { width: 100%; height: auto; aspect-ratio: 16 / 9; }
+
+/* En teléfono se sirve el montaje vertical, así que el marco cambia de forma
+   con él. `data-forma` lo pone el script al elegir la fuente; el límite de
+   altura evita que el video ocupe la pantalla entera y deje al lector sin
+   referencia de dónde está. */
+.pantalla[data-forma="vertical"] {
+  /* El tope de altura se traduce a ancho con la propia proporción 9:16. Si se
+     limitara solo la altura, la caja quedaba más ancha que el video y salían
+     franjas negras a los lados. */
+  max-width: min(420px, calc(72vh * 9 / 16));
+  margin-inline: auto;
+}
+.pantalla[data-forma="vertical"] video {
+  aspect-ratio: 9 / 16;
+  margin-inline: auto;
+}
 .nota-pie {
   margin: 16px 0 0;
   font-size: 14.5px;

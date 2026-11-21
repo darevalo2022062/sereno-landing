@@ -112,16 +112,65 @@
     <div class="caja">
       <p class="rotulo">En 30 segundos</p>
       <h2>Así se ve en el teléfono.</h2>
-      <div class="pantalla">
-        <video controls playsinline preload="metadata" poster="medios/parcela.jpg">
-          <source src="medios/sereno-30s-horizontal.mp4" type="video/mp4" />
+      <!-- Hay dos montajes del mismo demo: 1920x1080 para pantalla ancha y
+           1080x1920 para teléfono. El <video> arranca con el horizontal para
+           que funcione sin JavaScript, y el script de abajo cambia la fuente
+           cuando la pantalla es angosta. -->
+      <div class="pantalla" data-forma="horizontal">
+        <video
+          id="demo"
+          controls
+          playsinline
+          preload="metadata"
+          poster="medios/poster-horizontal.jpg"
+          src="medios/sereno-30s-horizontal.mp4"
+          data-horizontal="medios/sereno-30s-horizontal.mp4"
+          data-vertical="medios/sereno-30s-vertical.mp4"
+          data-poster-horizontal="medios/poster-horizontal.jpg"
+          data-poster-vertical="medios/poster-vertical.jpg"
+        >
           Su navegador no puede reproducir el video.
           <a href="medios/sereno-30s-horizontal.mp4">Descargarlo</a>.
         </video>
       </div>
+      <script>
+        (function () {
+          var v = document.getElementById("demo");
+          if (!v || !window.matchMedia) return;
+          var marco = v.parentElement;
+          var angosta = window.matchMedia("(max-width: 767px)");
+
+          function elegir() {
+            var quiero = angosta.matches ? v.dataset.vertical : v.dataset.horizontal;
+            var cartel = angosta.matches ? v.dataset.posterVertical : v.dataset.posterHorizontal;
+            marco.dataset.forma = angosta.matches ? "vertical" : "horizontal";
+            // El póster se cambia junto con la fuente: uno apaisado dentro de
+            // un marco vertical deja dos franjas negras enormes.
+            if (v.getAttribute("poster") !== cartel) v.setAttribute("poster", cartel);
+            // Comparo por el final de la ruta: el navegador devuelve la URL
+            // absoluta y el atributo es relativa.
+            if (v.currentSrc.endsWith(quiero) || v.getAttribute("src") === quiero) return;
+
+            var iba = v.currentTime;
+            var sonaba = !v.paused && !v.ended;
+            v.setAttribute("src", quiero);
+            v.load();
+            v.addEventListener("loadedmetadata", function una() {
+              v.removeEventListener("loadedmetadata", una);
+              if (iba) { try { v.currentTime = iba; } catch (e) {} }
+              if (sonaba) { v.play().catch(function () {}); }
+            });
+          }
+
+          elegir();
+          if (angosta.addEventListener) angosta.addEventListener("change", elegir);
+          else angosta.addListener(elegir);
+        })();
+      </script>
       <p class="nota-pie">
         Grabado contra la aplicación que está corriendo en producción, con datos de
-        clima reales. No es una maqueta.
+        clima reales. No es una maqueta. En teléfono se reproduce el montaje
+        vertical; en pantalla ancha, el horizontal.
       </p>
     </div>
   </section>
